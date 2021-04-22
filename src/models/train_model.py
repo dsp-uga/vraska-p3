@@ -1,3 +1,8 @@
+"""
+The following model was inspired heavily by the TensorFlow documentation for Image Segmentation.
+
+https://www.tensorflow.org/tutorials/images/segmentation
+"""
 import os
 import numpy as numpy
 import tarfile
