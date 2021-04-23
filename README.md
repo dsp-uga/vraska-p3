@@ -9,7 +9,7 @@ vraska-p3
 ## Synopsis
 The purpose of this project was to apply various image segmentation techniques to a set of images of cells and attempt to segment and identify the cilia. We implemented a U-net Convolutional Neural Network for semantic segmentation to accomplish this.
 
-## Dependencies
+## Requirements
 - numpy
 - pandas
 - tensorflow
@@ -82,6 +82,14 @@ Project Organization
 
 
 --------
+
+## Contributors
+Please check [Contributors](https://github.com/dsp-uga/vraska-p3/blob/main/CONTRIBUTORS.md) file for details.
+
+## Authors
+    - Aishwarya Venkataraj
+    - Nathan Wynn
+    - Yogesh Chaudhari
 
 ### References
 We referenced the Tensorflow documentation [here](https://www.tensorflow.org/tutorials/images/segmentation) in some of our .py files as a starting point to get acclimated to using the U-net model, but most of our final work only slightly extends from some of the code examples on the documentation site.
