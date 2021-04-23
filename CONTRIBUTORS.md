@@ -1,7 +1,7 @@
 ## Contributors
 
 - Aishwarya Venkataraj
-  -Worked on the U-Net model   
+  - Worked on the U-Net model   
 
 - Nathan Wynn
 
