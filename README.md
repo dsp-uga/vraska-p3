@@ -18,6 +18,30 @@ The purpose of this project was to apply various image segmentation techniques t
 - matplotlib
 - tqdm
 
+## Dataset
+
+The dataset used follows the following organization scheme:
+------------
+
+    ├── Train.txt  
+    ├── Test.txt  
+    ├── data
+    │   ├── hash001
+    │       ├──   frame0001.png
+    │       ├──   frame0002.png
+    │       ├──   ...
+    │   ├──  hash002   
+    │   ├── ...
+    │   └── hash0325  
+    ├── masks
+    │   ├── hash001.png
+    │   ├── hash002.png   
+    │   ├── ...
+    │   └── hash0211.png 
+------------
+
+Each folder in the `data` directory contains 100 consecutive frames of a grayscale video of cilia. The names of the `.png` files in the `masks` directory correspond to the respective folder in the `data` directory.
+
 ## Approach
 We decided, after spending some time pouring over the Tiramisu model, to go with a U-net model. U-net is a convolutional neural network that was modified by its creators to work with fewer training images and yeild more precise results.
 
