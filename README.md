@@ -87,9 +87,9 @@ Project Organization
 Please check [Contributors](https://github.com/dsp-uga/vraska-p3/blob/main/CONTRIBUTORS.md) file for details.
 
 ## Authors
-    - Aishwarya Venkataraj
-    - Nathan Wynn
-    - Yogesh Chaudhari
+   - Aishwarya Venkataraj
+   - Nathan Wynn
+   - Yogesh Chaudhari
 
 ### References
 We referenced the Tensorflow documentation [here](https://www.tensorflow.org/tutorials/images/segmentation) in some of our .py files as a starting point to get acclimated to using the U-net model, but most of our final work only slightly extends from some of the code examples on the documentation site.
