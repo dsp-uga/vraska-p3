@@ -41,7 +41,9 @@ The dataset used follows the following organization scheme:
     │   └── hash0211.png 
 ------------
 
-Each folder in the `data` directory contains 100 consecutive frames of a grayscale video of cilia. The names of the `.png` files in the `masks` directory correspond to the respective folder in the `data` directory.
+The dataset consists of two text files train.txt and test.txt. These text files have a list of hashes. These hashes are the names of folders containing the training and testing data. Each hash folder consists if 100 consecutive gray-scale images from a cilia movement video. The data is divided into 65/35, 211 images for training and 114 images for testing.
+Each image in the training folder consists of a corresponding mask image in the mask folder. So there are a total of 211 mask images. We have to predict the mask for the other 114 images.
+The name of the mask image corresponds to the hash folder name in the data folder.
 
 ## Approach
 We decided, after spending some time pouring over the Tiramisu model, to go with a U-net model. U-net is a convolutional neural network that was modified by its creators to work with fewer training images and yeild more precise results.
