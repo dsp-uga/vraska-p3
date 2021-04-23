@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[234]:
-
-
-get_ipython().system('pip install tensorflow_addons')
-
-
-# In[235]:
+# In[1]:
 
 
 import os
@@ -22,13 +16,13 @@ import matplotlib.pyplot as plt
 import tensorflow_addons as tfa
 
 
-# In[4]:
+# In[2]:
 
 
 # pip install keras
 
 
-# In[5]:
+# In[3]:
 
 
 from tqdm import tqdm
@@ -48,7 +42,7 @@ import tensorflow as tf
 import cv2
 
 
-# In[6]:
+# In[4]:
 
 
 IMG_WIDTH = 256
@@ -56,7 +50,7 @@ IMG_HEIGHT = 256
 IMG_CHANNELS = 3
 
 
-# In[7]:
+# In[5]:
 
 
 train_path = '/home/vraskap3/datas/train/data/'#enter path to training data
@@ -65,7 +59,7 @@ mask_path = '/home/vraskap3/datas/masks/'
 output_path = '/home/vraskap3/datas/output/'
 
 
-# In[8]:
+# In[6]:
 
 
 train_ids = next(os.walk(train_path))[1]
@@ -73,28 +67,28 @@ test_ids = next(os.walk(test_path))[1]
 # print(test_ids)
 
 
-# In[9]:
+# In[7]:
 
 
 X_train = np.zeros((len(train_ids), IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS), dtype=np.uint8)
 Y_train = np.zeros((len(train_ids), IMG_HEIGHT, IMG_WIDTH, 1), dtype=np.uint8)
 
 
-# In[10]:
+# In[8]:
 
 
 print("X_train",X_train.shape)
 print("Y_train",Y_train.shape)
 
 
-# In[11]:
+# In[9]:
 
 
 print('Getting and resizing train images and masks ... ')
 sys.stdout.flush()
 
 
-# In[33]:
+# In[10]:
 
 
 def normalize(input_image, input_mask):
@@ -103,7 +97,7 @@ def normalize(input_image, input_mask):
     return input_image, input_mask
 
 
-# In[34]:
+# In[11]:
 
 
 # @tf.function
@@ -120,7 +114,7 @@ def load_image_train(image, mask):
     return input_image, input_mask
 
 
-# In[35]:
+# In[12]:
 
 
 def load_image_test(image):
@@ -130,7 +124,7 @@ def load_image_test(image):
     return input_image
 
 
-# In[15]:
+# In[13]:
 
 
 def display(display_list):
@@ -145,7 +139,7 @@ def display(display_list):
     plt.show()
 
 
-# In[16]:
+# In[14]:
 
 
 base_model = tf.keras.applications.MobileNetV2(input_shape=[IMG_WIDTH, IMG_HEIGHT, 3], include_top=False)
@@ -166,7 +160,7 @@ down_stack = tf.keras.Model(inputs=base_model.input, outputs=base_model_outputs)
 down_stack.trainable = False
 
 
-# In[17]:
+# In[15]:
 
 
 from tensorflow_examples.models.pix2pix import pix2pix
@@ -179,7 +173,7 @@ up_stack = [
 ]
 
 
-# In[18]:
+# In[16]:
 
 
 def unet_model(output_channels):
@@ -205,13 +199,13 @@ def unet_model(output_channels):
     return tf.keras.Model(inputs=inputs, outputs=x)
 
 
-# In[19]:
+# In[17]:
 
 
 OUTPUT_CHANNELS = 3
 
 
-# In[236]:
+# In[18]:
 
 
 model = unet_model(OUTPUT_CHANNELS)
@@ -220,84 +214,57 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 
-# In[237]:
+# In[19]:
 
 
 model.summary()
 
 
-# In[238]:
+# In[20]:
 
 
-tf_tensors_images = []
-tf_tensors_masks = []
-for n, ids in tqdm(enumerate(train_ids), total=len(train_ids)):
-    path = train_path + ids +'/'
-    image = imread(path +'frame0000.png')[:,:]
-    image = resize(image, (IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS), mode='constant', preserve_range=True)
-
-    mask_one = imread(mask_path + ids + '.png')[:,:]
-    mask = resize(mask_one, (IMG_HEIGHT, IMG_WIDTH, 1), preserve_range=True)
-
-    in_image, in_mask = load_image_train(image, mask)
-    tf_tensors_images.append(in_image)
-    tf_tensors_masks.append(in_mask)
+frame_name_prefix = "frame00"
+frame_name_suffix = ".png"
+frame_names = []
+frame_id_numbers = np.arange(0, 100, 1)
+for i in range(len(frame_id_numbers)):
+    frame_id = f'0{frame_id_numbers[i]}' if frame_id_numbers[i] < 10 else f'{frame_id_numbers[i]}'
+    frame_names.append(frame_name_prefix + frame_id + frame_name_suffix)
 
 
-# In[239]:
+# In[21]:
 
 
-tf.keras.preprocessing.image.array_to_img(tf_tensors_images[0])
+for frame in frame_names:
+    print(f"processing for {frame}")
+    tf_tensors_images = []
+    tf_tensors_masks = []
+    for n, ids in tqdm(enumerate(train_ids), total=len(train_ids)):
+        path = train_path + ids +'/'
+        image = imread(path + frame)[:,:]
+        image = resize(image, (IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS), mode='constant', preserve_range=True)
 
+        mask_one = imread(mask_path + ids + '.png')[:,:]
+        mask = resize(mask_one, (IMG_HEIGHT, IMG_WIDTH, 1), preserve_range=True)
 
-# In[240]:
+        in_image, in_mask = load_image_train(image, mask)
+        tf_tensors_images.append(in_image)
+        tf_tensors_masks.append(in_mask)
 
-
-tf.keras.preprocessing.image.array_to_img(tf_tensors_masks[0])
-
-
-# In[241]:
-
-
-dataset = tf.data.Dataset.from_tensor_slices((tf_tensors_images, tf_tensors_masks))
-
-
-# In[242]:
-
-
-dataset
-
-
-# In[243]:
-
-
-BUFFER_SIZE = 211
-BATCH_SIZE = 16
-train = dataset.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
-
-
-# In[244]:
-
-
-train
-
-
-# In[245]:
-
-
-history = model.fit(train, 
-                    epochs=10,
-                    steps_per_epoch=16
-                   )
+    dataset = tf.data.Dataset.from_tensor_slices((tf_tensors_images, tf_tensors_masks))
+    BUFFER_SIZE = 211
+    BATCH_SIZE = 16
+    val = dataset.take(20).cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+    train = dataset.skip(20).cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+    history = model.fit(train, 
+                        epochs=1,
+                        steps_per_epoch=16,
+                        validation_steps=1,
+                        validation_data=val,
+                       )
 
 
 # In[ ]:
-
-
-history
-
-
-# In[224]:
 
 
 test_tensors_images = []
@@ -307,46 +274,46 @@ for n, ids in tqdm(enumerate(test_ids), total=len(test_ids)):
     image = imread(path +'frame0000.png')[:,:]
     test_image_shapes.append(image.shape)
     image = resize(image, (IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS), mode='constant', preserve_range=True)
-
-
     in_image = load_image_test(image)
     test_tensors_images.append(in_image)
-
-
-# In[225]:
-
-
-tf.keras.preprocessing.image.array_to_img(test_tensors_images[0])
-
-
-# In[226]:
-
+    
 
 test_dataset = tf.data.Dataset.from_tensor_slices((test_tensors_images))
-# pred_mask = model.predict(test_tensors_images[0])
 
-
-# In[227]:
-
-
-test_dataset
-
-
-# In[228]:
-
-
-BUFFER_SIZE = 114
 BATCH_SIZE = 1
 test = test_dataset.cache().batch(BATCH_SIZE)
 
 
-# In[229]:
+# In[ ]:
 
 
-len(test)
+# for n, ids in tqdm(enumerate(test_ids), total=len(test_ids)):
+#     for frame in frame_names:
+#         path = test_path + ids +'/'
+#         image = imread(path + frame)[:,:]
+#         test_image_shapes.append(image.shape)
+#         image = resize(image, (IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS), mode='constant', preserve_range=True)
+#         in_image = load_image_test(image)
+#         test_tensors_images.append(in_image)
+    
+#     test_dataset = tf.data.Dataset.from_tensor_slices((test_tensors_images))
+#     BATCH_SIZE = 1
+#     test = test_dataset.cache().batch(BATCH_SIZE)
+#     final_mask = False
+#     for image in test:
+#         pred_mask = model.predict(image)
+#         pred_mask = tf.argmax(pred_mask, axis=-1)
+#         pred_mask = pred_mask[..., tf.newaxis]
+#         mk = pred_mask[0]
+#         if not final_mask:
+#             final_mask = mk
+#         else:
+            
+#     mk = tf.image.resize(mk, test_image_shapes[i], method=tf.image.ResizeMethod.BILINEAR, preserve_aspect_ratio=False, antialias=False, name=None)
+#     tf.keras.preprocessing.image.save_img(f'{output_path}/{test_ids[i]}.png', mk)
 
 
-# In[230]:
+# In[ ]:
 
 
 im = []
@@ -359,54 +326,9 @@ for image in test:
     pred_mask = pred_mask[..., tf.newaxis]
     im = image[0]
     mk = pred_mask[0]
-    print(test_image_shapes[i])
     mk = tf.image.resize(mk, test_image_shapes[i], method=tf.image.ResizeMethod.BILINEAR, preserve_aspect_ratio=False, antialias=False, name=None)
     tf.keras.preprocessing.image.save_img(f'{output_path}/{test_ids[i]}.png', mk)
     i += 1
-
-
-# In[231]:
-
-
-tf.keras.preprocessing.image.array_to_img(im)
-
-
-# In[232]:
-
-
-tf.keras.preprocessing.image.array_to_img(mk)
-
-
-# In[209]:
-
-
-tf.print(tf.reshape(mk, shape=(256,256)), summarize=256)
-
-
-# In[ ]:
-
-
-tf.keras.preprocessing.image.save_img(mk)
-
-
-# In[196]:
-
-
-path = test_path + "5c569a019e6fe7be42d3f91f437fd011598594a456a76245c8e28b1bbcbdcf30" +'/'
-image = imread(path +'frame0000.png')[:,:]
-    
-
-
-# In[197]:
-
-
-image
-
-
-# In[198]:
-
-
-image.shape
 
 
 # In[ ]:
