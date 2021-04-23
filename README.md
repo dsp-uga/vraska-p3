@@ -13,6 +13,7 @@ The purpose of this project was to apply various image segmentation techniques t
 - numpy
 - pandas
 - tensorflow
+- keras
 - skimage
 - cv2
 - matplotlib
